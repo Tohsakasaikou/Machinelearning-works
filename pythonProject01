@@ -1,0 +1,12 @@
+def firstwork():
+    matplotlib.pyplot.figure("yichi")
+    circle_X,circle_Y = make_circles(n_samples=4000,noise=0.1,factor=0.1)
+    matplotlib.pyplot.scatter(circle_X[:,0],circle_X[:,1],c=circle_Y)
+
+    matplotlib.pyplot.figure("ni")
+    moon_X,moon_Y = make_moons(n_samples=4000,noise=0.1)
+    matplotlib.pyplot.scatter(moon_X[:,0],moon_X[:,1],c=circle_Y)
+
+    matplotlib.pyplot.show()
+
+firstwork()
