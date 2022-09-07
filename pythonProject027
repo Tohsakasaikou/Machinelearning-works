@@ -1,0 +1,92 @@
+# This is a sample Python script.
+
+# Press Shift+F10 to execute it or replace it with your code.
+# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+
+
+
+# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+import random
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import sklearn
+from sklearn.datasets import make_circles
+
+# Sklearn中的make_circles方法生成训练样本
+X_circle, Y_circle = make_circles(n_samples=400, noise=0.1, factor=0.1)
+
+# 随机生成测试样本
+n = np.random.randint(0, 10, size=1)
+ran = random.random()
+x = pow(-1, n) * ran
+n = np.random.randint(0, 10, size=1)
+ran = random.random()
+y = pow(-1, n) * ran
+print(x, y)
+
+# 第一幅图
+plt.subplot(1, 2, 1)
+plt.scatter(X_circle[:, 0], X_circle[:, 1], s=100, marker="o", edgecolors='m', c=Y_circle)
+# c=Y_circle划分两种标签数据的颜色
+plt.title('data by make_circles()')
+plt.scatter(x, y, s=300, marker="*", edgecolors='black', c='red')
+
+# 第二幅图
+plt.subplot(1, 2, 2)
+plt.scatter(X_circle[:, 0], X_circle[:, 1], s=100, marker="o", edgecolors='m', c=Y_circle)
+plt.scatter(x, y, s=300, marker="*", edgecolors='black', c='red')
+plt.title('KNN(k=15)')
+
+# 转化为DataFrame格式
+data = {'x坐标': X_circle[:, 0], 'y坐标': X_circle[:, 1], }
+olddata = pd.DataFrame(data, dtype='double')
+
+# 计算欧式距离,距离排序
+new_x_y = [float(x), float(y)]
+distance = (((olddata - new_x_y) ** 2).sum(1)) ** 0.5  # 得到((x1-x2)^2+(y1-y2)^2)^0.5
+# print(distance)
+disdata = pd.DataFrame({'x坐标': X_circle[:, 0], 'y坐标': X_circle[:, 1], '距离': distance}, dtype='double').sort_values(
+    by='距离')
+# print((disdata))
+
+# 距离最短前k个
+k = 15
+plt.scatter(disdata.iloc[:k, 0], disdata.iloc[:k, 1], s=100, marker="o", edgecolors='black', c='red')
+plt.show()
+
+
+from sklearn import datasets
+from sklearn.datasets import load_iris
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import LeaveOneOut
+
+iris = load_iris()  # 导入数据集
+data = iris.data
+target = iris.target
+loo= LeaveOneOut()  # 分割数据集
+K = []
+Ac = []
+for k in range(1, 21):
+    cum = 0
+    knn = KNeighborsClassifier(k)
+    for train, test in loo.split(data):
+
+        knn.fit(data[train], target[train])
+        # 训练函数，通过训练的数据让机器学习到对应关系
+
+        y_sample = knn.predict(data[test])
+        # 预测函数 接收输入的数组类型测试样本，
+        # 通过data【test】来预测y_sample
+        # 如果y_sample==target【test】，则预测符合结果
+        if y_sample == target[test]:
+            cum += 1
+    Ac.append(cum / len(data))
+    K.append(k)
+    plt.plot(K, Ac)
+    plt.xlabel('K')
+    plt.ylabel('Accuracy')
+    print("K:", k)
+    print("Test Accuracy", cum / len(data))
+
+plt.show()
